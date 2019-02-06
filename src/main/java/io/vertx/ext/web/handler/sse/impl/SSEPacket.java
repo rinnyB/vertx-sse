@@ -19,7 +19,15 @@ class SSEPacket {
 
 	boolean append(Buffer buffer) {
 		String response = buffer.toString();
-		boolean willTerminate = response.endsWith(END_OF_PACKET);
+		if (buffer.toString().startsWith(":")) {
+			// If the line starts with a U+003A COLON character (:)
+			// Ignore the line.
+			return false;
+		}
+		boolean willTerminate = response.endsWith(END_OF_PACKET);		
+		if (!willTerminate){ // it is pointless to process incomplete packet
+			return willTerminate;
+		}
 		String[] lines = response.split(LINE_SEPARATOR);
 		for (int i = 0; i < lines.length; i++) {
 			final String line = lines[i];
@@ -41,6 +49,6 @@ class SSEPacket {
 
 	@Override
 	public String toString() {
-		return payload == null ? "" : payload.toString();
+		return (payload == null) ? "" : payload.toString();
 	}
 }
